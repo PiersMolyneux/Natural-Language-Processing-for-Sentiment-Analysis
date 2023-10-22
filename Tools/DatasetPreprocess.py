@@ -82,6 +82,7 @@ def CleanText(df, column):
     df[column] = df[column].apply(remove_stopwords)
     return df
 
+# Function to clean a single string
 def CleanString(text):
     text = denoise_text(text)
     text = remove_special_characters(text)
