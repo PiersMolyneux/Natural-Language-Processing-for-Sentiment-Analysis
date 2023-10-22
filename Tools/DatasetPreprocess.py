@@ -3,6 +3,8 @@ import pandas as pd
 import re
 import nltk
 from nltk.tokenize.toktok import ToktokTokenizer
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.preprocessing import LabelBinarizer
 from bs4 import BeautifulSoup
 import warnings
 
@@ -22,15 +24,6 @@ def PrintInfoDF(df):
     print(df.describe())
     print(df['sentiment'].value_counts())
 
-
-# Split the data into train/test
-def SplitData(df):
-    split = int(0.8 * len(df))
-    train_reviews = df.review[:split]
-    train_sentiments = df.sentiment[:split]
-    test_reviews = df.review[split:]
-    test_sentiments = df.sentiment[split:]
-    return train_reviews, train_sentiments, test_reviews, test_sentiments
 
 # HTML Stripping - NOT WORKING
 def strip_html(text):
@@ -88,3 +81,10 @@ def CleanText(df, column):
     df[column] = df[column].apply(stem_text)
     df[column] = df[column].apply(remove_stopwords)
     return df
+
+def CleanString(text):
+    text = denoise_text(text)
+    text = remove_special_characters(text)
+    text = stem_text(text)
+    text = remove_stopwords(text)
+    return text
