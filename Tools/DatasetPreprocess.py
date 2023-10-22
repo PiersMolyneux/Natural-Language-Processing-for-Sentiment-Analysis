@@ -8,9 +8,6 @@ from sklearn.preprocessing import LabelBinarizer
 from bs4 import BeautifulSoup
 import warnings
 
-# For this section https://www.kaggle.com/code/lakshmi25npathi/sentiment-analysis-of-imdb-movie-reviews/notebook used as reference
-
-
 def LoadData(path):
     # Import dataset
     imdb_df = pd.read_csv(path)
