@@ -1,34 +1,45 @@
-from Tools.DatasetPreprocess import LoadData, CleanText
-import pandas as pd
-import sklearn
-from sklearn import metrics
-from sklearn.naive_bayes import MultinomialNB 
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.model_selection import train_test_split
+from fastapi import FastAPI, HTTPException
+import joblib
+from Tools.DatasetPreprocess import CleanString
+from pydantic import BaseModel
 
 
-# Load the IMDB dataframe
-df = LoadData(path='Data/IMDB_Dataset.csv')
+app = FastAPI(
+    title = 'Launching NLP model',
+    description = 'Launching a Natural Language Processing Sentiment model to predict sentiment on film reviews',
+    version = '0.1.0'
+)
 
-#converting the sentiments (positive and negatives) to 1 and 0. 
-df.sentiment = (df.sentiment.replace({'positive': 1, 'negative': 0})).values
+class InputData(BaseModel):
+    text: str
 
-# The dataset is balanced which has been verified from PrintInfoDF function in Tools
+class PredictionResult(BaseModel):
+    prediction: str
 
-# Clean the data
-df = CleanText(df, 'review')
+model = joblib.load('MBD_NLP_model.joblib')
+tfidf = joblib.load('tfidf_vectorizer.joblib')
 
-# Vectorize the review data
-tfidf = TfidfVectorizer(min_df=2, max_df=0.5, ngram_range=(1,2))
-vectorized_text = tfidf.fit_transform(df.review)
 
-# Split data, reviews are the inputs, sentiments are the targets
-X_train, X_test, y_train, y_test = train_test_split(vectorized_text, df.sentiment, test_size=0.3)
+@app.get('/')
+def read_root():
+    return {'message': 'Welcome to the NLP sentiment model API'}
 
-MNB = MultinomialNB()
-MNB.fit(X_train, y_train)
+@app.post('/predict/', response_model=PredictionResult)
+def predict(input_data: InputData):
+    try:
+        cleaned_text = CleanString(input_data.text)
+        vectorized_text = tfidf.transform([cleaned_text])
+        # if not vectorized_text:
+        #     raise HTTPException(status_code=400, detail='Invalid input data')
+        prediction = model.predict(vectorized_text)[0]
+        if prediction == 0:
+            prediction = 'The sentiment of this text is Negative'
+        else:
+            prediction = 'The sentiment of this text is Positive'
+        return {'prediction': prediction}
 
-accuracy_score = metrics.accuracy_score(MNB.predict(X_test), y_test)
-print("accuracy_score = " + str('{:04.2f}'.format(accuracy_score*100))+" %")
+    
+    except:
+        raise HTTPException(status_code=500, detail='Internal server error')
 
 
