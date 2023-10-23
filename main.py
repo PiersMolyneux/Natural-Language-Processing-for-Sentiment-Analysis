@@ -10,7 +10,7 @@ app = FastAPI(
     version='0.1.0'
 )
 
-# Define input and output data models using Pydantic
+# Define input and output data models using Pydantic to verify data types
 class InputData(BaseModel):
     text: str
 

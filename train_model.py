@@ -11,11 +11,12 @@ import joblib
 
 # Load the IMDB dataframe
 df = LoadData(path='Data/IMDB_Dataset.csv')
+# The dataset is balanced which has been verified from PrintInfoDF function in Tools
+# It is possible to further explore the dataset, e.g. histograms etc
 
 #converting the sentiments (positive and negatives) to 1 and 0
 df.sentiment = (df.sentiment.replace({'positive': 1, 'negative': 0})).values
 
-# The dataset is balanced which has been verified from PrintInfoDF function in Tools
 
 # Clean the data
 df = CleanText(df, 'review')

@@ -22,10 +22,10 @@ def PrintInfoDF(df):
     print(df['sentiment'].value_counts())
 
 
-# HTML Stripping - NOT WORKING
-def strip_html(text):
-    soup = BeautifulSoup(text, 'html.parser')
-    return soup.get_text()
+# # HTML Stripping - NOT WORKING
+# def strip_html(text):
+#     soup = BeautifulSoup(text, 'html.parser')
+#     return soup.get_text()
 
 
 # Remove any text between square brackets, e.g. [text]
